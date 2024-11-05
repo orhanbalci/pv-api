@@ -22,6 +22,20 @@ async fn retrieve(
     }
 }
 
+async fn search(
+    Path(term): Path<String>,
+    State(state): State<MyState>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+    match sqlx::query_as::<_, Proverb>("SELECT * FROM proverb WHERE proverb like '%$1%'")
+        .bind(term)
+        .fetch_all(&state.pool)
+        .await
+    {
+        Ok(proverbs) => Ok((StatusCode::OK, Json(proverbs))),
+        Err(e) => Err((StatusCode::BAD_REQUEST, e.to_string())),
+    }
+}
+
 // async fn add(
 //     State(state): State<MyState>,
 //     Json(data): Json<TodoNew>,
@@ -52,6 +66,7 @@ async fn main(#[shuttle_shared_db::Postgres] pool: PgPool) -> shuttle_axum::Shut
     let router = Router::new()
         // .route("/todos", post(add))
         .route("/proverb/:id", get(retrieve))
+        .route("/proverb/search/:term", get(search))
         .with_state(state);
 
     Ok(router.into())
