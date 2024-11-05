@@ -1,13 +1,11 @@
-# Shuttle shared Postgres DB with Axum
+# Atasozleri Ve Deyimler API
 
-This template shows how to connect a Postgres database and use it for a simple TODO list app.
+TDK'da kayitli tum stasozlerini ve deyimleri sorgulayabileceginiz bir API.
 
-## Example usage
+
+## Ornek kullanim
 
 ```bash
-curl -X POST -H 'content-type: application/json' localhost:8000/todos --data '{"note":"My todo"}'
-# {"id":1,"note":"My todo"}
-
-curl localhost:8000/todos/1
-# {"id":1,"note":"My todo"}
+curl https://pv-api-zj7q.shuttle.app/proverb/
+# {"id":1,"proverb":"a'dan z'ye (kadar)","meaning":"baştan aşağı, tamamen, tamamıyla, bütünüyle: Evini a'dan z'ye değiştirdi.","proverb_type":"Deyim"}
 ```
