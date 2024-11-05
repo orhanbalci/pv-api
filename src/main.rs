@@ -26,8 +26,8 @@ async fn search(
     Path(term): Path<String>,
     State(state): State<MyState>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    match sqlx::query_as::<_, Proverb>("SELECT * FROM proverb WHERE proverb like '%$1%'")
-        .bind(term)
+    match sqlx::query_as::<_, Proverb>("SELECT * FROM proverb WHERE proverb like $1")
+        .bind(format!("%{}%", term))
         .fetch_all(&state.pool)
         .await
     {
