@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, State},
-    http::StatusCode,
+    http::{Method, StatusCode},
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
@@ -10,6 +10,8 @@ use rand::{seq::SliceRandom, Rng};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
+use tower_http::cors::{Any, CorsLayer};
+
 pub mod quiz;
 
 async fn retrieve(
@@ -102,12 +104,18 @@ async fn main(#[shuttle_shared_db::Postgres] pool: PgPool) -> shuttle_axum::Shut
         .await
         .expect("Failed to run migrations");
 
+    let cors = CorsLayer::new()
+        // allow `GET` and `POST` when accessing the resource
+        .allow_methods([Method::GET, Method::POST])
+        // allow requests from any origin
+        .allow_origin(Any);
     let state = MyState { pool };
     let router = Router::new()
         // .route("/todos", post(add))
         .route("/proverb/:id", get(retrieve))
         .route("/proverb/search/:term", get(search))
         .route("/proverb/quiz", get(quiz))
+        .layer(cors)
         .with_state(state);
 
     Ok(router.into())
